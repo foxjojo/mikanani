@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.ksoup.korlibs)
     implementation(libs.ksoup.network.korlibs)
     implementation(libs.androidx.core.ktx)
