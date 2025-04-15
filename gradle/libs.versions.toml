@@ -6,8 +6,9 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 kotlinxCoroutinesAndroid = "1.10.1"
-ksoupKorlibs = "0.2.2"
-ksoupNetworkKorlibs = "0.2.2"
+
+ksoupKotlinx = "0.2.2"
+ksoupNetwork = "0.2.2"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 composeBom = "2024.09.00"
@@ -28,8 +29,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-ksoup-korlibs = { module = "com.fleeksoft.ksoup:ksoup-korlibs", version.ref = "ksoupKorlibs" }
-ksoup-network-korlibs = { module = "com.fleeksoft.ksoup:ksoup-network-korlibs", version.ref = "ksoupNetworkKorlibs" }
+ksoup-kotlinx = { module = "com.fleeksoft.ksoup:ksoup-kotlinx", version.ref = "ksoupKotlinx" }
+ksoup-network = { module = "com.fleeksoft.ksoup:ksoup-network", version.ref = "ksoupNetwork" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -40,9 +40,10 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.ksoup.korlibs)
-    implementation(libs.ksoup.network.korlibs)
+
+// Ksoup.parseFile, Ksoup.parseSource
+    implementation(libs.ksoup.kotlinx)
+    implementation(libs.ksoup.network)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
