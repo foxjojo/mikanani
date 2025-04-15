@@ -41,7 +41,9 @@ android {
 
 dependencies {
 
-// Ksoup.parseFile, Ksoup.parseSource
+    implementation(libs.coil.compose)
+
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.ksoup.kotlinx)
     implementation(libs.ksoup.network)
     implementation(libs.androidx.core.ktx)

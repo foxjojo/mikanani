@@ -5,6 +5,18 @@ data class DayData(
     val aniList: MutableList<DayAniData>,
 )
 
+data object NumToDay {
+    val map: Map<Int, String> = mapOf(
+        1 to "星期一",
+        2 to "星期二",
+        3 to "星期三",
+        4 to "星期四",
+        5 to "星期五",
+        6 to "星期六",
+        0 to "星期日",
+        7 to "剧场版",
+    )
+}
 
 data class DayAniData(
     val imgUrl: String,
