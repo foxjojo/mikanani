@@ -5,70 +5,99 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequest
-import com.fleeksoft.ksoup.network.parseGetRequestBlocking
 import com.fleeksoft.ksoup.nodes.Document
-import com.fleeksoft.ksoup.select.Elements
-import korlibs.io.resources.resource
+
+import kotlinx.coroutines.launch
 import me.mikanani.ui.theme.MikananiTheme
 
 class MainActivity : ComponentActivity() {
+    enum class LoadState {
+        LOADING,
+        LOADED,
+        ERROR
+    }
+
+    class Data {
+        var loadState: LoadState = LoadState.LOADING
+        lateinit var doc: Document
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MikananiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
 
-                    formatData(resources.getString(R.string.url_root))
+                    var loadData by remember { mutableStateOf(Data()) }
+                    LaunchedEffect(loadData) {
+                        var doc =
+                            Ksoup.parseGetRequest(url = resources.getString(R.string.url_root))
+                        loadData = Data().apply {
+                            this.doc = doc
+                            this.loadState = LoadState.LOADED
+                        }
+                    }
 
-                    rememberCoroutineScope
+                    when (loadData.loadState) {
+                        LoadState.LOADING -> {
+                            Text(text = "Loading")
+                        }
+
+                        LoadState.LOADED -> {
+                            FormatData(
+                                loadData.doc,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+
+                        LoadState.ERROR -> {
+                            Text(text = "Error")
+                        }
+                    }
+
                 }
             }
         }
     }
 }
-suspend fun getData(urlRoot: String,callback){
-    val doc: Document = Ksoup.parseGetRequest(url = urlRoot)
-}
-@Composable
-suspend fun formatData(urlRoot: String) {
-    val doc: Document = Ksoup.parseGetRequest(url = urlRoot)
-    val days = doc.getElementsByClass("sk-bangumi")
 
-    days.forEach { element ->
-        element.getElementsByClass("an-info").forEach { aniInfo ->
-            Column {
-                Text(aniInfo.text())
+
+@Composable
+fun FormatData(doc: Document, modifier: Modifier = Modifier) {
+    val days = doc.getElementsByClass("sk-bangumi")
+    LazyColumn {
+        items(days.size) { index ->
+            Row {
+                Text(days[index].text(), modifier = modifier)
             }
         }
     }
+//    days.forEach { element ->
+//        element.getElementsByClass("an-info").forEach { aniInfo ->
+//
+//                items() {  }
+//                Text(aniInfo.text(), modifier = modifier)
+//            }
+//        }
+//    }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MikananiTheme {
-        Greeting("Android")
-    }
-}
