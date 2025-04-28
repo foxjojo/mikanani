@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navigator = rememberNavController()
-            MikananiTheme {
+            MaterialTheme {
 
                 Nav(navigator, this)
                 navigator.navigate(Home(""))

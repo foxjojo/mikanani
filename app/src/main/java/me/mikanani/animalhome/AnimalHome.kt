@@ -37,65 +37,23 @@ import me.mikanani.data.NumToDay
 
 @Composable
 fun AnimalHome(
-    context: Context,
     navigators: NavHostController,
     animalHomeViewModel: AnimalHomeViewModel
 ) {
-    class Data {
-        var loadState: LoadState = LoadState.LOADING
-        lateinit var days: MutableList<DayData>
-    }
 
-    var loadData by remember { mutableStateOf(Data()) }
-    LaunchedEffect(loadData) {
-        var rootUrl = context.resources.getString(R.string.url_root)
-        var doc =
-            Ksoup.parseGetRequest(url = rootUrl)
-        var days: MutableList<DayData> = mutableListOf()
-        val daysClass = doc.getElementsByClass("sk-bangumi")
-
-        daysClass.forEach { element ->
-            var dayIndex = element.attr("data-dayofweek")
-            var aniList: MutableList<DayAniData> = mutableListOf()
-            element.getElementsByClass("list-inline an-ul").forEach { ul ->
-                ul.getElementsByTag("li").forEach { li ->
-                    if (!li.getElementsByTag("a").isEmpty()) {
-                        var imgUrl = li.getElementsByTag("span")[0].attr("data-src")
-                        var name = li.getElementsByTag("a")[0].attr("title")
-                        var url = li.getElementsByTag("a")[0].attr("href")
-                        aniList.add(
-                            DayAniData(
-                                rootUrl + imgUrl,
-                                name,
-                                rootUrl + url
-                            )
-                        )
-                    }
-                }
-            }
-
-
-            days.add(DayData(dayIndex.toInt(), aniList))
-        }
-
-
-        loadData = Data().apply {
-            this.days = days
-            this.loadState = LoadState.LOADED
-        }
-    }
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-        when (loadData.loadState) {
+        animalHomeViewModel.data
+        when (animalHomeViewModel.data.loadState.value) {
             LoadState.LOADING -> {
                 Text(text = "Loading", Modifier.padding(innerPadding))
             }
 
             LoadState.LOADED -> {
                 FormatData(
-                    loadData.days,
+                    animalHomeViewModel.data.days,
                     navigators,
-                    Modifier.padding(innerPadding)
+                    Modifier.padding(innerPadding),
+                    animalHomeViewModel
                 )
             }
 
@@ -111,7 +69,8 @@ fun AnimalHome(
 fun FormatData(
     days: MutableList<DayData>,
     navigators: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    animalHomeViewModel: AnimalHomeViewModel
 ) {
     LazyColumn(modifier = modifier) {
         items(days.size) { index ->
@@ -122,7 +81,7 @@ fun FormatData(
                 )
             ) {
                 items(days[index].aniList.size) { aniIndex ->
-                    AnimCard(days[index].aniList[aniIndex], navigators)
+                    AnimCard(days[index].aniList[aniIndex], navigators, animalHomeViewModel)
                 }
             }
         }
@@ -132,7 +91,7 @@ fun FormatData(
 
 
 @Composable
-fun AnimCard(info: DayAniData, navigators: NavHostController) {
+fun AnimCard(info: DayAniData, navigators: NavHostController, animalHomeViewModel: AnimalHomeViewModel) {
 
     Card(
         colors = CardDefaults.cardColors(
@@ -141,7 +100,8 @@ fun AnimCard(info: DayAniData, navigators: NavHostController) {
         modifier = Modifier
             .size(width = 140.dp, height = 180.dp)
             .clickable {
-                navigators.navigate(Detail(info, Modifier))
+                animalHomeViewModel.curSelect = info
+                navigators.navigate(Detail())
             }
     ) {
         Column {

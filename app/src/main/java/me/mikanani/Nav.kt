@@ -14,30 +14,31 @@ import me.mikanani.data.DayAniData
 
 
 @Serializable
-data class Home(val id: String="")
+data class Home(val id: String = "")
 
 @Serializable
-data class Detail(val dayData: DayAniData)
+data class Detail(val id: String = "")
 
 
 @Composable
 fun Nav(navController: NavHostController, context: Context) {
-    val animalHomeViewModel = AnimalHomeViewModel()
-    val animalDetailViewModel = AnimalDetailsViewModel()
+    val animalHomeViewModel = AnimalHomeViewModel(context.resources.getString(R.string.url_root))
+    val animalDetailViewModel = AnimalDetailsViewModel(animalHomeViewModel)
     NavHost(
         navController,
         startDestination = Home()
     ) {
 
         composable<Home> {
+            animalHomeViewModel.refresh()
             AnimalHome(
-                context,
                 navController,
                 animalHomeViewModel
             )
         }
 
         composable<Detail> {
+            animalDetailViewModel.refresh()
             AnimalDetails(animalDetailViewModel)
         }
 
