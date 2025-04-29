@@ -30,7 +30,7 @@ fun Nav(navController: NavHostController, context: Context) {
     ) {
 
         composable<Home> {
-            animalHomeViewModel.refresh()
+            //animalHomeViewModel.refresh()
             AnimalHome(
                 navController,
                 animalHomeViewModel
@@ -38,7 +38,7 @@ fun Nav(navController: NavHostController, context: Context) {
         }
 
         composable<Detail> {
-            animalDetailViewModel.refresh()
+
             AnimalDetails(animalDetailViewModel)
         }
 

@@ -37,10 +37,11 @@ import me.mikanani.data.NumToDay
 
 @Composable
 fun AnimalHome(
-    navigators: NavHostController,
-    animalHomeViewModel: AnimalHomeViewModel
+    navigators: NavHostController, animalHomeViewModel: AnimalHomeViewModel
 ) {
-
+    LaunchedEffect(Unit) {
+        animalHomeViewModel.refresh()
+    }
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         animalHomeViewModel.data
         when (animalHomeViewModel.data.loadState.value) {
@@ -50,10 +51,7 @@ fun AnimalHome(
 
             LoadState.LOADED -> {
                 FormatData(
-                    animalHomeViewModel.data.days,
-                    navigators,
-                    Modifier.padding(innerPadding),
-                    animalHomeViewModel
+                    animalHomeViewModel.data.days, navigators, Modifier.padding(innerPadding), animalHomeViewModel
                 )
             }
 
@@ -67,10 +65,7 @@ fun AnimalHome(
 
 @Composable
 fun FormatData(
-    days: MutableList<DayData>,
-    navigators: NavHostController,
-    modifier: Modifier = Modifier,
-    animalHomeViewModel: AnimalHomeViewModel
+    days: MutableList<DayData>, navigators: NavHostController, modifier: Modifier = Modifier, animalHomeViewModel: AnimalHomeViewModel
 ) {
     LazyColumn(modifier = modifier) {
         items(days.size) { index ->
@@ -96,20 +91,18 @@ fun AnimCard(info: DayAniData, navigators: NavHostController, animalHomeViewMode
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        modifier = Modifier
+        ), modifier = Modifier
             .size(width = 140.dp, height = 180.dp)
             .clickable {
                 animalHomeViewModel.curSelect = info
-                navigators.navigate(Detail())
-            }
-    ) {
+
+                navigators.navigate(Detail()) { launchSingleTop = true }
+
+            }) {
         Column {
             AsyncImage(model = info.imgUrl, "")
             Text(
-                text = info.name,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(10.dp)
+                text = info.name, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp)
             )
         }
 

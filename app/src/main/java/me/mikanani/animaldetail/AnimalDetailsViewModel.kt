@@ -20,6 +20,7 @@ import io.ktor.http.CookieEncoding
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.cookies
 import io.ktor.http.setCookie
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.mikanani.animalhome.AnimalHomeViewModel
 import me.mikanani.data.AniInfoData
@@ -37,25 +38,20 @@ class AnimalDetailsViewModel(val animalHomeViewModel: AnimalHomeViewModel) : Vie
     val data = Data()
 
     fun refresh() {
-        data.loadState .value = LoadState.LOADING
+        data.loadState.value = LoadState.LOADING
         viewModelScope.launch {
-            val httpRequestBuilder = io.ktor.client.request.HttpRequestBuilder()
-
-
             val httpResponse = NetworkHelperKtor.instance.get(animalHomeViewModel.curSelect.infoUrl)
 //        url can be changed after redirection
             val finalUrl = httpResponse.request.url.toString()
             val preCookie = httpResponse.headers.get("set-cookie")?.split(";")[0]
 
             var doc = Ksoup.parseInput(input = httpResponse.asInputStream(), parser = Parser.htmlParser(), baseUri = finalUrl)
-
-
             val desc = doc.getElementsByClass("header2-desc").first()?.text()
             var subGroups =
                 doc.getElementsByClass("subgroup-text")
             val subGroupsInfoData: MutableList<SubgroupData> = mutableListOf()
             for (subGroup in subGroups) {
-
+                delay(1000)
                 val subInfo =
                     subGroup.getElementsByClass("pull-right subgroup-subscribe js-subscribe_bangumi_page")
                         .first()
@@ -64,7 +60,7 @@ class AnimalDetailsViewModel(val animalHomeViewModel: AnimalHomeViewModel) : Vie
                     val subtitleGroupId = subInfo.attr("data-subtitlegroupid")
                     val bangumiId = subInfo.attr("data-bangumiid")
                     doc = Ksoup.parseGetRequest(
-                        url = "https://mikanani.me/Home/ExpandEpisodeTable?bangumiId=${bangumiId}&subtitleGroupId=${subtitleGroupId}&take=65",
+                        url = "https://mikanani.tv/Home/ExpandEpisodeTable?bangumiId=${bangumiId}&subtitleGroupId=${subtitleGroupId}&take=65",
                         httpRequestBuilder = {
                             cookie(preCookie!!.split("=")[0], preCookie!!.split("=")[1])
                         }
