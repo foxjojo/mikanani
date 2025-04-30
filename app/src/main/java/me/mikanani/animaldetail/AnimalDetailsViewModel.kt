@@ -1,27 +1,14 @@
 package me.mikanani.animaldetail
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fleeksoft.ksoup.Ksoup
-import com.fleeksoft.ksoup.network.NetworkHelperKtor
-import com.fleeksoft.ksoup.network.asInputStream
 import com.fleeksoft.ksoup.network.parseGetRequest
-import com.fleeksoft.ksoup.network.parseSubmitRequest
-import com.fleeksoft.ksoup.parseInput
-import com.fleeksoft.ksoup.parser.Parser
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.cookie
-import io.ktor.client.statement.request
-import io.ktor.http.Cookie
-import io.ktor.http.CookieEncoding
-import io.ktor.http.HeadersBuilder
-import io.ktor.http.cookies
-import io.ktor.http.setCookie
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.mikanani.R
 import me.mikanani.animalhome.AnimalHomeViewModel
 import me.mikanani.data.AniInfoData
 import me.mikanani.data.DownloadData
@@ -29,7 +16,7 @@ import me.mikanani.data.LoadState
 import me.mikanani.data.SubgroupData
 
 
-class AnimalDetailsViewModel(val animalHomeViewModel: AnimalHomeViewModel) : ViewModel() {
+class AnimalDetailsViewModel(val urlRoot: String, val animalHomeViewModel: AnimalHomeViewModel) : ViewModel() {
     class Data {
         var loadState = mutableStateOf(LoadState.LOADING)
         lateinit var info: AniInfoData
@@ -40,18 +27,13 @@ class AnimalDetailsViewModel(val animalHomeViewModel: AnimalHomeViewModel) : Vie
     fun refresh() {
         data.loadState.value = LoadState.LOADING
         viewModelScope.launch {
-            val httpResponse = NetworkHelperKtor.instance.get(animalHomeViewModel.curSelect.infoUrl)
-//        url can be changed after redirection
-            val finalUrl = httpResponse.request.url.toString()
-            val preCookie = httpResponse.headers.get("set-cookie")?.split(";")[0]
-
-            var doc = Ksoup.parseInput(input = httpResponse.asInputStream(), parser = Parser.htmlParser(), baseUri = finalUrl)
+            var doc = Ksoup.parseGetRequest(animalHomeViewModel.curSelect.infoUrl)
             val desc = doc.getElementsByClass("header2-desc").first()?.text()
             var subGroups =
                 doc.getElementsByClass("subgroup-text")
             val subGroupsInfoData: MutableList<SubgroupData> = mutableListOf()
             for (subGroup in subGroups) {
-                delay(1000)
+                delay(500)
                 val subInfo =
                     subGroup.getElementsByClass("pull-right subgroup-subscribe js-subscribe_bangumi_page")
                         .first()
@@ -60,12 +42,8 @@ class AnimalDetailsViewModel(val animalHomeViewModel: AnimalHomeViewModel) : Vie
                     val subtitleGroupId = subInfo.attr("data-subtitlegroupid")
                     val bangumiId = subInfo.attr("data-bangumiid")
                     doc = Ksoup.parseGetRequest(
-                        url = "https://mikanani.tv/Home/ExpandEpisodeTable?bangumiId=${bangumiId}&subtitleGroupId=${subtitleGroupId}&take=65",
-                        httpRequestBuilder = {
-                            cookie(preCookie!!.split("=")[0], preCookie!!.split("=")[1])
-                        }
+                        url = urlRoot + "/Home/ExpandEpisodeTable?bangumiId=${bangumiId}&subtitleGroupId=${subtitleGroupId}&take=65",
                     )
-
                     var list: MutableList<DownloadData> = mutableListOf()
                     doc.body().getElementsByTag("tr").forEach {
                         var tds = it.getElementsByTag("td")

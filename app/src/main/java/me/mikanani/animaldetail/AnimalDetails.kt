@@ -1,5 +1,7 @@
 package me.mikanani.animaldetail
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.mikanani.data.AniInfoData
@@ -35,15 +38,20 @@ fun AnimalDetails(animalDetailsViewModel: AnimalDetailsViewModel) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         when (animalDetailsViewModel.data.loadState.value) {
             LoadState.LOADING -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(64.dp),
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+
+                }
+
             }
 
             LoadState.LOADED -> {
                 AnimalDetailsCompose(animalDetailsViewModel.data.info, Modifier.padding(innerPadding))
+
             }
 
             LoadState.ERROR -> {

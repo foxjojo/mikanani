@@ -10,7 +10,6 @@ import me.mikanani.animaldetail.AnimalDetails
 import me.mikanani.animaldetail.AnimalDetailsViewModel
 import me.mikanani.animalhome.AnimalHome
 import me.mikanani.animalhome.AnimalHomeViewModel
-import me.mikanani.data.DayAniData
 
 
 @Serializable
@@ -23,7 +22,7 @@ data class Detail(val id: String = "")
 @Composable
 fun Nav(navController: NavHostController, context: Context) {
     val animalHomeViewModel = AnimalHomeViewModel(context.resources.getString(R.string.url_root))
-    val animalDetailViewModel = AnimalDetailsViewModel(animalHomeViewModel)
+    val animalDetailViewModel = AnimalDetailsViewModel(context.resources.getString(R.string.url_root),animalHomeViewModel)
     NavHost(
         navController,
         startDestination = Home()
